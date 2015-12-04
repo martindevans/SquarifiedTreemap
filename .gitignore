@@ -1,0 +1,16 @@
+*.user
+*.suo
+*.ncrunchsolution
+*.ncrunchproject
+*.cache
+
+_Resharper.Caches
+_Resharper.Poly2Tri
+_NCrunch_SquarifiedTreemap
+packages
+
+SquarifiedTreemap/bin
+SquarifiedTreemap/obj
+
+SquarifiedTreemap.Test/bin
+SquarifiedTreemap.Test/obj

@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SquarifiedTreemap", "SquarifiedTreemap\SquarifiedTreemap.csproj", "{D3965AC6-F2BD-48E3-AD00-F6E25E6719F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SquarifiedTreemap.Test", "SquarifiedTreemap.Test\SquarifiedTreemap.Test.csproj", "{2C16390E-FFC1-47B9-B4AA-CDB976A12B93}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D3965AC6-F2BD-48E3-AD00-F6E25E6719F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3965AC6-F2BD-48E3-AD00-F6E25E6719F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3965AC6-F2BD-48E3-AD00-F6E25E6719F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3965AC6-F2BD-48E3-AD00-F6E25E6719F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C16390E-FFC1-47B9-B4AA-CDB976A12B93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C16390E-FFC1-47B9-B4AA-CDB976A12B93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C16390E-FFC1-47B9-B4AA-CDB976A12B93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C16390E-FFC1-47B9-B4AA-CDB976A12B93}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
