@@ -13,18 +13,18 @@ namespace SquarifiedTreemap.Test.Model.Output
         public void AssertThat_AddingChildToLeafNode_Throws()
         {
             // ReSharper disable once ObjectCreationAsStatement
-            new Node<TestData>(new TestData("1"), 10)
+            new Node<TestData>(null, new TestData("1"), 10)
             {
-                new Node<TestData>(null, 1)
+                new Node<TestData>(null, null, 1)
             };
         }
 
         [TestMethod]
         public void AssertThat_AddingChildToLeafNode_AddsToCollection()
         {
-            var a = new Node<TestData>(new TestData("1"), true, 10)
+            var a = new Node<TestData>(null, new TestData("1"), true, 10)
             {
-                new Node<TestData>(null, 1)
+                new Node<TestData>(null, null, 1)
             };
 
             Assert.AreEqual(1, a.Count());

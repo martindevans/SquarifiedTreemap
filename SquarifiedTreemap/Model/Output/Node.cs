@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using SwizzleMyVectors.Geometry;
 
 namespace SquarifiedTreemap.Model.Output
 {
@@ -8,6 +9,8 @@ namespace SquarifiedTreemap.Model.Output
         : IReadOnlyList<Node<T>> 
         where T : ITreemapNode
     {
+        private readonly Treemap<T> _map;
+
         /// <summary>
         /// The value associated with this output node
         /// </summary>
@@ -17,6 +20,25 @@ namespace SquarifiedTreemap.Model.Output
         /// Indicates if this node is a leaf
         /// </summary>
         public bool IsLeaf { get; private set; }
+
+        private BoundingRectangle? _bounds;
+
+        /// <summary>
+        /// The space assigned to this node
+        /// </summary>
+        public BoundingRectangle Bounds
+        {
+            get
+            {
+                //Read cache, lazily generate rectangle if none
+                if (!_bounds.HasValue)
+                    _map.GenerateBounds();
+                if (!_bounds.HasValue)
+                    throw new InvalidOperationException("Failed to assigned bounds to treemap node");
+                return _bounds.Value;
+            }
+            internal set { _bounds = value; }
+        }
 
         private bool _splitVertical;
         /// <summary>
@@ -39,20 +61,20 @@ namespace SquarifiedTreemap.Model.Output
 
         private readonly List<Node<T>> _children = new List<Node<T>>();  
 
-        internal Node(T value, bool splitVertical, float length)
+        internal Node(Treemap<T> map, T value, bool splitVertical, float length)
         {
+            _map = map;
             Value = value;
-
             SplitVertical = splitVertical;
             IsLeaf = false;
 
             Length = length;
         }
 
-        internal Node(T value, float length)
+        internal Node(Treemap<T> map, T value, float length)
         {
+            _map = map;
             Value = value;
-
             SplitVertical = false;
             IsLeaf = true;
 
@@ -65,6 +87,26 @@ namespace SquarifiedTreemap.Model.Output
                 throw new InvalidOperationException("Cannot add child to leaf node");
 
             _children.Add(child);
+        }
+
+        /// <summary>
+        /// Swap the positions of two child nodes
+        /// </summary>
+        /// <param name="item1"></param>
+        /// <param name="item2"></param>
+        public void Swap(int item1, int item2)
+        {
+            //Get the items
+            var a = _children[item1];
+            var b = _children[item2];
+
+            //Swap them
+            _children[item1] = b;
+            _children[item2] = a;
+
+            //Clear the bounds caches of both subtrees
+            a._bounds = null;
+            b._bounds = null;
         }
 
         public int Count => _children.Count;

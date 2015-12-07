@@ -10,68 +10,61 @@ namespace SquarifiedTreemap.Model.Output
         where T : ITreemapNode
     {
         public BoundingRectangle StartSpace { get; }
-        public Node<T> Root { get; set; }
+        public Node<T> Root { get; private set; }
 
-        private Treemap(BoundingRectangle startSpace, Node<T> root)
+        private Treemap(BoundingRectangle startSpace)
         {
             StartSpace = startSpace;
-            Root = root;
         }
 
-        public IEnumerable<KeyValuePair<BoundingRectangle, T>> Rectangles(bool onlyLeaves)
+        #region bounds generation
+        internal void GenerateBounds()
         {
-            return Rectangles(StartSpace, (Node<T>)Root, onlyLeaves);
+            GenerateBounds(StartSpace, new[] { Root }, Root.SplitVertical);
         }
 
-        internal static IEnumerable<KeyValuePair<BoundingRectangle, T>> Rectangles(BoundingRectangle space, Node<T> root, bool onlyLeaves)
+        internal static void GenerateBounds(BoundingRectangle space, IEnumerable<Node<T>> nodes, bool verticalSplit)
         {
-            return Rectangles(space, new[] {
-                root
-            }, root.SplitVertical, onlyLeaves);
-        }
+            //No explicit base case - it's just the case where the foreach loop doesn't loop i.e. node has no children
 
-        internal static IEnumerable<KeyValuePair<BoundingRectangle, T>> Rectangles(BoundingRectangle space, IEnumerable<Node<T>> nodes, bool verticalSplit, bool onlyLeaves)
-        {
             float total = 0;
             foreach (var node in nodes)
             {
                 //Calculate bounds for this node
-                BoundingRectangle box;
-                if (verticalSplit)
-                    box = new BoundingRectangle(new Vector2(total, space.Min.Y), new Vector2(total + node.Length, space.Max.Y));
-                else
-                    box = new BoundingRectangle(new Vector2(space.Min.X, total), new Vector2(space.Max.X, total + node.Length));
+                node.Bounds = verticalSplit
+                    ? new BoundingRectangle(new Vector2(total, space.Min.Y), new Vector2(total + node.Length, space.Max.Y))
+                    : new BoundingRectangle(new Vector2(space.Min.X, total), new Vector2(space.Max.X, total + node.Length));
 
                 //Increase total to offset next box
                 total += node.Length;
 
-                //return it (if necessary)
-                if (!onlyLeaves || node.IsLeaf)
-                    yield return new KeyValuePair<BoundingRectangle, T>(box, node.Value);
-
-                //Recurse
-                foreach (var n in Rectangles(box, (IEnumerable<Node<T>>)node, node.SplitVertical, onlyLeaves))
-                    yield return n;
+                //Recursively generate bounds for child nodes
+                GenerateBounds(node.Bounds, node, node.SplitVertical);
             }
         }
+        #endregion
 
-        public static Treemap<T> Build(BoundingRectangle space, Input.ITree<T> data)
+        #region building treemap
+        public static Treemap<T> Build(BoundingRectangle space, ITree<T> data)
         {
+            //Create the output
+            var map = new Treemap<T>(space);
+
             //Create root node with unspecified direction and length
-            var root = new Node<T>(data.Root.Value, -1);
+            var root = new Node<T>(map, data.Root.Value, -1);
+            map.Root = root;
 
             //Create the map, this will initialize the direction of the root node
-            DivideNode(space, data.Root, root, new ArrayPool<float>());
+            DivideNode(space, data.Root, root, new ArrayPool<float>(), map);
 
             //Initialize the length of the root node
             root.Length = Size(space, !root.SplitVertical);
 
-            return new Treemap<T>(space, root);
+            return map;
         }
 
-        private static void DivideNode(BoundingRectangle space, INode<T> input, Node<T> output, ArrayPool<float> pool)
+        private static void DivideNode(BoundingRectangle space, INode<T> input, Node<T> output, ArrayPool<float> pool, Treemap<T> map)
         {
-
             //Recursion base case
             if (input.Count == 0)
                 return;
@@ -85,56 +78,53 @@ namespace SquarifiedTreemap.Model.Output
                 //Free the unused array
                 pool.Free(v);
 
-                SplitHorizontal(space, input, output, h, pool);
+                SplitHorizontal(space, input, output, h, pool, map);
             }
             else
             {
                 //Free the unused array
                 pool.Free(h);
 
-                SplitVertical(space, input, output, v, pool);
+                SplitVertical(space, input, output, v, pool, map);
             }
         }
 
-        private static void ApplySplit(BoundingRectangle space, INode<T> input, Node<T> output, float[] sizes, ArrayPool<float> pool)
+        private static void ApplySplit(BoundingRectangle space, INode<T> input, Node<T> output, float[] sizes, ArrayPool<float> pool, Treemap<T> map)
         {
             //Create child nodes and add them to the parent
             var index = 0;
             foreach (var child in input)
-                output.Add(new Node<T>(child.Value, sizes[index++]));
+                output.Add(new Node<T>(map, child.Value, sizes[index++]));
 
             //Now that we're done with the array, free it
             pool.Free(sizes);
 
             //Recursively subdivide each child
-            float total = 0;
-            for (int i = 0; i < output.Count; i++)
+            for (var i = 0; i < output.Count; i++)
             {
                 var iNode = input[i];
                 var oNode = output[i];
 
-                //Calculate bounds for this node
-                BoundingRectangle box;
-                if (output.SplitVertical)
-                    box = new BoundingRectangle(new Vector2(total, space.Min.Y), new Vector2(total + oNode.Length, space.Max.Y));
-                else
-                    box = new BoundingRectangle(new Vector2(space.Min.X, total), new Vector2(space.Max.X, total + oNode.Length));
+                //Calculate bounds for this node (the bounds are not in the right place, they are the right *size* which is the only thing we care about here)
+                var box = output.SplitVertical
+                    ? new BoundingRectangle(new Vector2(0, space.Min.Y), new Vector2(oNode.Length, space.Max.Y))
+                    : new BoundingRectangle(new Vector2(space.Min.X, 0), new Vector2(space.Max.X, oNode.Length));
 
                 //Recursion
-                DivideNode(box, iNode, oNode, pool);
+                DivideNode(box, iNode, oNode, pool, map);
             }
         }
 
-        private static void SplitHorizontal(BoundingRectangle space, INode<T> input, Node<T> output, float[] sizes, ArrayPool<float> pool)
+        private static void SplitHorizontal(BoundingRectangle space, INode<T> input, Node<T> output, float[] sizes, ArrayPool<float> pool, Treemap<T> map)
         {
             output.SplitVertical = false;
-            ApplySplit(space, input, output, sizes, pool);
+            ApplySplit(space, input, output, sizes, pool, map);
         }
 
-        private static void SplitVertical(BoundingRectangle space, INode<T> input, Node<T> output, float[] sizes, ArrayPool<float> pool)
+        private static void SplitVertical(BoundingRectangle space, INode<T> input, Node<T> output, float[] sizes, ArrayPool<float> pool, Treemap<T> map)
         {
             output.SplitVertical = true;
-            ApplySplit(space, input, output, sizes, pool);
+            ApplySplit(space, input, output, sizes, pool, map);
         }
 
         /// <summary>
@@ -181,5 +171,6 @@ namespace SquarifiedTreemap.Model.Output
             var size = bounds.Max - bounds.Min;
             return vertical ? size.Y : size.X;
         }
+        #endregion
     }
 }
