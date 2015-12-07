@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("SquarifiedTreemap")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Generates squarified treemap diagrams")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("SquarifiedTreemap")]
