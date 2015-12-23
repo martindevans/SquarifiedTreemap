@@ -32,8 +32,8 @@ namespace SquarifiedTreemap.Model.Output
             {
                 //Calculate bounds for this node
                 node.Bounds = verticalSplit
-                    ? new BoundingRectangle(new Vector2(total, space.Min.Y), new Vector2(total + node.Length, space.Max.Y))
-                    : new BoundingRectangle(new Vector2(space.Min.X, total), new Vector2(space.Max.X, total + node.Length));
+                    ? new BoundingRectangle(new Vector2(total + space.Min.X, space.Min.Y), new Vector2(total + node.Length + space.Min.X, space.Max.Y))
+                    : new BoundingRectangle(new Vector2(space.Min.X, total + space.Min.Y), new Vector2(space.Max.X, total + node.Length + space.Min.Y));
 
                 //Increase total to offset next box
                 total += node.Length;

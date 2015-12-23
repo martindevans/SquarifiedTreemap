@@ -139,6 +139,18 @@ namespace SquarifiedTreemap.Test.Model.Output
         }
 
         [TestMethod]
+        public void AssertThat_GenerateBounds_ProducesSpecifiedRectangles_WithRootNode_WithTwoChildren_WithNonZeroRectangle()
+        {
+            var a = new Node<TestData>(null, new TestData("0"), 4);
+            var b = new Node<TestData>(null, new TestData("1"), 6);
+
+            Treemap<TestData>.GenerateBounds(new BoundingRectangle(new Vector2(-7, -5), new Vector2(3, 5)), new[] { a, b, }, true);
+
+            Assert.AreEqual(new BoundingRectangle(new Vector2(-7, -5), new Vector2(-3, 5)), a.Bounds);
+            Assert.AreEqual(new BoundingRectangle(new Vector2(-3, -5), new Vector2(3, 5)), b.Bounds);
+        }
+
+        [TestMethod]
         public void AssertThat_GenerateBounds_ProducesAlternatelyAlignedRectangle_WithDepth3()
         {
             //Create a tree with hand calculated split values
