@@ -12,6 +12,11 @@ namespace SquarifiedTreemap.Model.Output
         public BoundingRectangle StartSpace { get; }
         public Node<T> Root { get; private set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="startSpace">The space which this tree occupies</param>
+        /// <param name="splitGroups">If set a continuous run of child nodes may be split into two runs</param>
         private Treemap(BoundingRectangle startSpace)
         {
             StartSpace = startSpace;

@@ -215,5 +215,19 @@ namespace SquarifiedTreemap.Test.Model.Output
             Assert.AreEqual(new BoundingRectangle(new Vector2(6, 0), new Vector2(10, 2)), tree.Skip(1).First().First().Bounds);
             Assert.AreEqual(new BoundingRectangle(new Vector2(6, 2), new Vector2(10, 10)), tree.Skip(1).First().Skip(1).First().Bounds);
         }
+
+        [TestMethod]
+        public void Playground()
+        {
+            var tree = new Tree<TestData>(new Tree<TestData>.Node {
+                new Tree<TestData>.Node(new TestData("1", 1)),
+                new Tree<TestData>.Node(new TestData("2", 2)),
+                new Tree<TestData>.Node(new TestData("3", 3))
+            });
+
+            var result = Treemap<TestData>.Build(new BoundingRectangle(new Vector2(0, 0), new Vector2(3, 2)), tree);
+
+            DrawTreemap(result);
+        }
     }
 }

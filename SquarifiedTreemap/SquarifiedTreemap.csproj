@@ -48,6 +48,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArrayPool.cs" />
+    <Compile Include="Extensions\ITreeNodeExtensions.cs" />
+    <Compile Include="ITreeNode.cs" />
     <Compile Include="Model\Input\ITree.cs" />
     <Compile Include="Model\ITreemapNode.cs" />
     <Compile Include="Model\Input\Tree.cs" />
