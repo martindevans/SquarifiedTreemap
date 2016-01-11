@@ -20,5 +20,11 @@ namespace SquarifiedTreemap.Model.Input
         float Area { get; }
 
         void Add(INode<T> item);
+
+        /// <summary>
+        /// Removes the given node
+        /// </summary>
+        /// <param name="item"></param>
+        bool Remove(INode<T> item);
     }
 }

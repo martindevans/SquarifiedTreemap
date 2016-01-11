@@ -51,6 +51,11 @@ namespace SquarifiedTreemap.Model.Input
                 _children.Add(node);
             }
 
+            public bool Remove(INode<T> node)
+            {
+                return _children.Remove(node);
+            }
+
             #region ienumerable
             public IEnumerator<INode<T>> GetEnumerator()
             {
